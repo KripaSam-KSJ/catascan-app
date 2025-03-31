@@ -34,7 +34,6 @@ const SignIn = () => {
       navigate("/signinsuccess");
     } catch (err) {
       setError(err.message || "An error occurred during sign-in.");
-      toast.error(err.message || "Sign-in failed.");
     }
   };
 
