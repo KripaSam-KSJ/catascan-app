@@ -1,99 +1,86 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [isClicked, setIsClicked] = useState(false);
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSignIn = (e) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
-    if (!email.includes("@")) {
-      setEmailError("Email must contain '@'");
+    if (!email.includes("@") || password.length < 6) {
+      setError("Please enter a valid email and password (min 6 characters).");
       return;
     }
-    setEmailError(""); // Clear error if valid
-    navigate("/signinsuccess");
+
+    try {
+      const response = await fetch("http://localhost:5000/signin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Sign-in failed");
+      }
+
+      localStorage.setItem("access_token", data.access_token);
+      localStorage.setItem("user_id", data.user_id);
+      navigate("/signinsuccess");
+    } catch (err) {
+      setError(err.message || "An error occurred during sign-in.");
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#6d8c94] px-4">
-      <div className="w-full max-w-md p-8 bg-white/30 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-200 text-gray-800 text-center">
-        
-        {/* Header */}
-        <h1 className="text-3xl font-bold text-gray-700 mb-2">Welcome <span className="text-[#1a3c40]">Back</span>!</h1>
-        <p className="text-gray-500 text-sm mb-6">Sign in to continue</p>
+    <div className="min-h-screen bg-gradient-to-br from-[#0d2a34] to-[#6d8c94] flex items-center justify-center p-6">
+      <div className="bg-[#1a3c40]/80 backdrop-blur-xl p-8 rounded-2xl w-full max-w-sm shadow-lg border border-[#b3d1d6]/20">
+        <h1 className="text-2xl font-bold text-[#b3d1d6] mb-6 text-center tracking-tight">
+          Sign In
+        </h1>
 
-        {/* Form */}
-        <form className="space-y-5" onSubmit={handleSignIn}>
-          
-          {/* Email Field */}
-          <div className="text-left">
-            <label htmlFor="email" className="block text-sm font-medium text-gray-600">Email</label>
-            <div className="flex items-center bg-gray-100 p-3 rounded-lg mt-1 shadow-sm">
-              <span className="text-gray-400 mr-2">📧</span>
-              <input 
-                type="email" 
-                id="email" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter Email Address"
-                className="w-full bg-transparent outline-none text-gray-700 placeholder-gray-400"
-              />
-            </div>
-            {emailError && <p className="text-red-500 text-xs mt-1">{emailError}</p>}
+        <form onSubmit={handleSignIn} className="space-y-6">
+          <div>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email Address"
+              className="w-full p-3 bg-[#6d8c94]/20 text-white placeholder-[#b3d1d6]/50 rounded-xl border border-[#b3d1d6]/20 focus:outline-none focus:ring-2 focus:ring-[#b3d1d6] transition-all"
+            />
           </div>
 
-          {/* Password Field */}
-          <div className="text-left">
-            <label htmlFor="password" className="block text-sm font-medium text-gray-600">Password</label>
-            <div className="flex items-center bg-gray-100 p-3 rounded-lg mt-1 shadow-sm">
-              <span className="text-gray-400 mr-2">🔒</span>
-              <input 
-                type="password" 
-                id="password" 
-                placeholder="Enter Password"
-                className="w-full bg-transparent outline-none text-gray-700 placeholder-gray-400"
-              />
-            </div>
+          <div>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              className="w-full p-3 bg-[#6d8c94]/20 text-white placeholder-[#b3d1d6]/50 rounded-xl border border-[#b3d1d6]/20 focus:outline-none focus:ring-2 focus:ring-[#b3d1d6] transition-all"
+            />
           </div>
 
-          {/* Remember & Forgot Password */}
-          <div className="flex justify-between text-xs text-gray-500">
-            <label className="flex items-center space-x-2">
-              <input type="checkbox" className="accent-cyan-500" />
-              <span>Remember Me</span>
-            </label>
-            <a href="#" className="hover:underline text-cyan-500">Forgot Password?</a>
-          </div>
+          {error && <p className="text-red-400 text-sm text-center">{error}</p>}
 
-          {/* Sign-in Button */}
-          <button 
+          <button
             type="submit"
-            className={`w-full p-3 rounded-lg text-lg font-semibold transition-all duration-300 
-              ${isClicked ? 'bg-[#3a506b] text-[#1a3c40] scale-95' : 'bg-[#1a3c40] text-white hover:bg-[#3a506b] hover:text-[#1a3c40] hover:scale-105'}`}
-            onMouseDown={() => setIsClicked(true)}
-            onMouseUp={() => setIsClicked(false)}
+            className="w-full p-3 bg-[#b3d1d6] text-[#0d2a34] rounded-xl font-semibold hover:bg-[#a1c3c8] transition-all duration-200 shadow-md"
           >
             Sign In
           </button>
 
-          {/* Divider */}
-          <div className="relative flex items-center my-4">
-            <div className="flex-grow border-t border-gray-300"></div>
-            <span className="mx-4 text-gray-400 text-sm">OR</span>
-            <div className="flex-grow border-t border-gray-300"></div>
-          </div>
-
-          {/* Register Link */}
-          <p className="text-sm text-gray-600">
-            Don't have an account?{' '}
-            <span 
-              onClick={() => navigate("/signup")} 
-              className="text-[#1a3c40] font-medium hover:underline cursor-pointer"
+          <p className="text-[#b3d1d6] text-sm text-center">
+            New here?{" "}
+            <span
+              onClick={() => navigate("/signup")}
+              className="underline cursor-pointer hover:text-white transition-colors"
             >
-              Register Now
+              Register
             </span>
           </p>
         </form>

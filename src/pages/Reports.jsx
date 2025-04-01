@@ -1,73 +1,106 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import { toast } from "react-toastify";
 
 const Reports = () => {
   const navigate = useNavigate();
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Sample scan reports data
-  const reports = [
-    { id: 1, title: "Scan 1", date: "Feb 10, 2025" },
-    { id: 2, title: "Scan 2", date: "Jan 24, 2025" },
-    { id: 3, title: "Scan 3", date: "Jan 10, 2025" },
-  ];
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem("access_token");
+        const response = await fetch("http://localhost:5000/scans", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to fetch reports");
+        }
+
+        setReports(data);
+      } catch (err) {
+        toast.error(err.message || "Failed to load reports.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReports();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#0d2a34] to-[#6d8c94] flex items-center justify-center p-6">
+        <div className="text-[#b3d1d6] text-lg">Loading...</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-[#0d2a34] flex flex-col items-center">
-      {/* Curved Header */}
-      <div className="bg-gradient-to-b from-[#b3d1d6] to-[#6d8c94] w-full h-40 rounded-b-3xl flex items-center px-6">
-        <h1 className="text-3xl font-bold text-black">Reports</h1>
+    <div className="min-h-screen bg-gradient-to-br from-[#0d2a34] to-[#6d8c94] flex flex-col items-center p-6">
+      <div className="w-full bg-[#1a3c40]/80 backdrop-blur-xl h-32 rounded-b-2xl flex items-center justify-center shadow-lg border-b border-[#b3d1d6]/20">
+        <h1 className="text-3xl font-bold text-[#b3d1d6] tracking-tight">
+          Reports
+        </h1>
       </div>
 
-      {/* Reports List */}
-      <div className="bg-[#6d8c94] p-5 mt-[-30px] rounded-2xl w-4/5 shadow-lg">
-        {reports.map((report) => (
-          <div
-            key={report.id}
-            className="flex items-center justify-between bg-white p-4 rounded-lg shadow-md mb-3"
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-[#6d8c94] text-xl font-bold">📄</span>
-              <div>
-                <h2 className="text-lg font-semibold">{report.title}</h2>
-                <p className="text-sm text-gray-500">{report.date}</p>
+      <div className="bg-[#1a3c40]/80 backdrop-blur-xl p-6 mt-8 w-full max-w-md rounded-2xl shadow-lg border border-[#b3d1d6]/20">
+        {reports.length === 0 ? (
+          <p className="text-[#b3d1d6] text-center">No reports available.</p>
+        ) : (
+          reports.map((report) => (
+            <div
+              key={report.scan_id}
+              className="flex items-center justify-between bg-[#6d8c94]/20 p-4 rounded-xl mb-4 shadow-md hover:bg-[#6d8c94]/30 transition-colors duration-200"
+            >
+              <div className="flex items-center gap-3">
+                <span className="text-[#b3d1d6] text-xl">📄</span>
+                <div>
+                  <h2 className="text-lg font-semibold text-white">
+                    Scan {report.scan_id.slice(0, 8)}
+                  </h2>
+                  <p className="text-sm text-[#b3d1d6]/80">
+                    {report.created_at}
+                  </p>
+                </div>
               </div>
+              <span
+                className="text-[#b3d1d6] text-xl cursor-pointer"
+                onClick={() =>
+                  navigate("/scan-results", {
+                    state: {
+                      result: {
+                        scan_id: report.scan_id,
+                        prediction:
+                          report.severity_level !== "None"
+                            ? "Cataract"
+                            : "No Cataract",
+                        confidence: 75, // Placeholder; ideally fetch from analysis
+                        severity: report.severity_level,
+                        feedback: report.feedback,
+                        recommendation: report.recommendation || "N/A",
+                      },
+                    },
+                  })
+                }
+              >
+                ⋮
+              </span>
             </div>
-            <span className="text-gray-600 text-xl">⋮</span>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
-      {/* Bottom Navbar */}
-      <div className="fixed bottom-0 w-full bg-[#15262e] p-3 flex justify-around border-t border-gray-600">
-        <button
-          onClick={() => navigate("/dashboard")}
-          className="flex flex-col items-center text-white"
-        >
-          <span className="text-xl">🏠</span>
-          <span className="text-xs">Home</span>
-        </button>
-        <button
-          onClick={() => navigate("/reports")}
-          className="flex flex-col items-center text-[#38b6ff]"
-        >
-          <span className="text-xl">📊</span>
-          <span className="text-xs">Reports</span>
-        </button>
-        <button
-          onClick={() => navigate("/settings")}
-          className="flex flex-col items-center text-white"
-        >
-          <span className="text-xl">⚙️</span>
-          <span className="text-xs">Settings</span>
-        </button>
-        <button
-          onClick={() => navigate("/profile")}
-          className="flex flex-col items-center text-white"
-        >
-          <span className="text-xl">👤</span>
-          <span className="text-xs">Profile</span>
-        </button>
-      </div>
+      <Navbar />
     </div>
   );
 };

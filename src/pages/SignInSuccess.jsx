@@ -1,37 +1,32 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { CheckCircle } from "lucide-react"; // Modern Checkmark Icon
+import { CheckCircle } from "lucide-react";
 
 const SignInSuccess = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("SignInSuccess Mounted. Redirecting in 3 seconds...");
     const timer = setTimeout(() => {
-      console.log("Redirecting to Home...");
       navigate("/dashboard");
     }, 3000);
-
     return () => clearTimeout(timer);
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#6d8c94]">
-      <div className="w-4/5 h-4/5 bg-white/20 backdrop-blur-xl p-16 rounded-3xl text-center shadow-2xl border border-white/30 flex flex-col items-center justify-center animate-fade-in">
-        
-        {/* Success Icon with Animation */}
-        <div className="flex justify-center items-center mb-8 relative">
-          <CheckCircle className="w-24 h-24 text-green-500 animate-bounce" />
-          <div className="absolute w-28 h-28 border-dotted border-4 border-green-400 rounded-full animate-ping"></div>
+    <div className="min-h-screen bg-gradient-to-br from-[#0d2a34] to-[#6d8c94] flex items-center justify-center p-6">
+      <div className="bg-[#1a3c40]/80 backdrop-blur-xl p-8 rounded-2xl w-full max-w-md shadow-lg border border-[#b3d1d6]/20 flex flex-col items-center justify-center animate-fade-in">
+        <div className="relative mb-8">
+          <CheckCircle className="w-20 h-20 text-[#b3d1d6] animate-bounce" />
+          <div className="absolute inset-0 w-24 h-24 border-2 border-dotted border-[#b3d1d6]/50 rounded-full animate-ping" />
         </div>
-
-        {/* Success Message */}
-        <h2 className="text-4xl font-bold text-white">Sign In Successful!</h2>
-        <p className="text-gray-100 mt-4 text-lg">Redirecting to Dashboard...</p>
-
-        {/* Subtle Loading Bar */}
-        <div className="w-2/3 bg-gray-500/30 h-2.5 mt-6 rounded-full overflow-hidden shadow-inner">
-          <div className="h-2.5 bg-green-400 animate-loading-bar"></div>
+        <h2 className="text-3xl font-bold text-[#b3d1d6] tracking-tight">
+          Sign In Successful!
+        </h2>
+        <p className="text-[#b3d1d6]/80 mt-4 text-lg">
+          Redirecting to Dashboard...
+        </p>
+        <div className="w-3/4 bg-[#6d8c94]/20 h-1.5 mt-6 rounded-full overflow-hidden">
+          <div className="h-full bg-[#b3d1d6] animate-loading-bar" />
         </div>
       </div>
     </div>

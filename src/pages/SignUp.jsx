@@ -1,102 +1,104 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaUserAstronaut } from "react-icons/fa6";
-import { MdOutlineMail } from "react-icons/md";
-import { IoCallOutline } from "react-icons/io5";
-import { CiLock } from "react-icons/ci";
+import { toast } from "react-toastify";
 
 const SignUp = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    username: "",
     email: "",
-    phone: "",
     password: "",
-    acceptedTerms: false,
   });
-  const [errors, setErrors] = useState({});
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    });
-
-    setErrors((prevErrors) => ({
-      ...prevErrors,
-      [name]: "", // Clear error when user types
-    }));
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    setError("");
   };
 
-  const validateForm = () => {
-    let newErrors = {};
-    if (!formData.username) newErrors.username = "Username is required";
-    if (!formData.email) newErrors.email = "Email is required";
-    else if (!formData.email.includes("@")) newErrors.email = "Email must contain an '@' symbol";
-    if (!formData.phone) newErrors.phone = "Phone number is required";
-    else if (!/^[0-9]{10}$/.test(formData.phone)) newErrors.phone = "Phone number must be 10 digits";
-    if (!formData.password) newErrors.password = "Password is required";
-    if (!formData.acceptedTerms) newErrors.acceptedTerms = "You must accept the Terms & Conditions";
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!formData.email.includes("@") || formData.password.length < 6) {
+      setError("Please enter a valid email and a password (min 6 characters).");
+      return;
+    }
 
-  const handleSubmit = () => {
-    if (validateForm()) {
-      navigate("/dashboard");
+    try {
+      const response = await fetch("http://localhost:5000/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Sign-up failed");
+      }
+
+      localStorage.setItem("user_id", data.user_id);
+      localStorage.setItem("access_token", data.access_token);
+      toast.success("Sign-up successful!");
+      navigate("/onboarding");
+    } catch (err) {
+      setError(err.message || "An error occurred during sign-up.");
+      toast.error(err.message || "Sign-up failed.");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#6d8c94] to-[#6d8c94] px-6">
-      <div className="w-full max-w-md p-8 bg-white/30 backdrop-blur-xl rounded-2xl shadow-2xl border border-white/40 text-gray-800">
-        <h1 className="text-3xl font-bold text-gray-700 text-center">Create A New Account</h1>
+    <div className="min-h-screen bg-gradient-to-br from-[#0d2a34] to-[#6d8c94] flex items-center justify-center p-6">
+      <div className="bg-[#1a3c40]/80 backdrop-blur-xl p-8 rounded-2xl w-full max-w-sm shadow-lg border border-[#b3d1d6]/20">
+        <h1 className="text-2xl font-bold text-[#b3d1d6] mb-6 text-center tracking-tight">
+          Create Account
+        </h1>
 
-        <div className="space-y-5 mt-6">
-          {[  
-            { label: "User Name", name: "username", type: "text", icon: <FaUserAstronaut />, placeholder: "Enter User-Name" },
-            { label: "Email", name: "email", type: "email", icon: <MdOutlineMail />, placeholder: "Enter Email Address" },
-            { label: "Phone Number", name: "phone", type: "tel", icon: <IoCallOutline/>, placeholder: "Enter Phone Number" },
-            { label: "Password", name: "password", type: "password", icon: <CiLock/>, placeholder: "Enter Password" }
-          ].map(({ label, name, type, icon, placeholder }) => (
-            <div key={name} className="text-left">
-              <label className="block text-sm font-medium text-gray-600">{label}</label>
-              <div className="flex items-center bg-white/40 backdrop-blur-md p-3 rounded-lg mt-1 shadow-md">
-                <span className="text-gray-400 mr-3">{icon}</span>
-                <input
-                  type={type}
-                  name={name}
-                  value={formData[name]}
-                  onChange={handleChange}
-                  placeholder={placeholder}
-                  className="w-full bg-transparent outline-none text-gray-700 placeholder-gray-400"
-                />
-              </div>
-              {errors[name] && <p className="text-red-500 text-xs mt-1">{errors[name]}</p>}
-            </div>
-          ))}
-
-          <div className="flex items-center text-gray-600 text-sm">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
             <input
-              type="checkbox"
-              name="acceptedTerms"
-              checked={formData.acceptedTerms}
+              type="email"
+              name="email"
+              value={formData.email}
               onChange={handleChange}
-              className="w-4 h-4 accent-[#1a3c40]"
+              placeholder="Email Address"
+              className="w-full p-3 bg-[#6d8c94]/20 text-white placeholder-[#b3d1d6]/50 rounded-xl border border-[#b3d1d6]/20 focus:outline-none focus:ring-2 focus:ring-[#b3d1d6] transition-all"
+              required
             />
-            <label className="ml-2">Accept the Terms & Conditions</label>
           </div>
-          {errors.acceptedTerms && <p className="text-red-500 text-xs mt-1">{errors.acceptedTerms}</p>}
 
-          <button 
-            onClick={handleSubmit} 
-            className="w-full p-3 rounded-lg text-lg font-semibold transition-all duration-300 
-                       bg-[#1a3c40] text-white hover:bg-[#145c5a] hover:scale-105 shadow-lg">
-            Proceed
+          <div>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="Password"
+              className="w-full p-3 bg-[#6d8c94]/20 text-white placeholder-[#b3d1d6]/50 rounded-xl border border-[#b3d1d6]/20 focus:outline-none focus:ring-2 focus:ring-[#b3d1d6] transition-all"
+              required
+            />
+          </div>
+
+          {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+
+          <button
+            type="submit"
+            className="w-full p-3 bg-[#b3d1d6] text-[#0d2a34] rounded-xl font-semibold hover:bg-[#a1c3c8] transition-all duration-200 shadow-md"
+          >
+            Sign Up
           </button>
-        </div>
+
+          <p className="text-[#b3d1d6] text-sm text-center">
+            Already have an account?{" "}
+            <span
+              onClick={() => navigate("/signin")}
+              className="underline cursor-pointer hover:text-white transition-colors"
+            >
+              Sign In
+            </span>
+          </p>
+        </form>
       </div>
     </div>
   );

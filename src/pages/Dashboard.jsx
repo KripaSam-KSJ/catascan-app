@@ -1,62 +1,47 @@
-import { Home, FileText, Settings, User, ScanEye, Lightbulb } from "lucide-react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
+import { ScanEye, Lightbulb } from "lucide-react";
+import Navbar from "../components/Navbar";
+import PreviousScans from "../components/PreviousScans";
 
-export default function CataractApp() {
+export default function Dashboard() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-200 to-cyan-500 flex flex-col items-center justify-center p-6">
-      
-      {/* Greeting Text */}
-      <h1 className="text-4xl font-extrabold text-gray-900 mb-8">
-        <span className="text-cyan-700">Hello</span> User...
+    <div className="min-h-screen bg-gradient-to-br from-[#0d2a34] to-[#6d8c94] p-6 flex flex-col items-center">
+      <h1 className="text-3xl font-bold text-white mb-10 tracking-tight drop-shadow-lg">
+        Welcome, <span className="text-[#b3d1d6]">User</span>
       </h1>
 
-      {/* Centered Blurred Box */}
-      <div className="bg-white/30 backdrop-blur-lg p-10 rounded-3xl w-full max-w-lg shadow-2xl flex flex-col items-center animate-fade-in">
-        <div className="space-y-8 w-full">
-          
-          {/* Scan Button */}
-          <div
-            className="bg-cyan-600 p-8 rounded-xl text-white shadow-lg cursor-pointer text-center flex flex-col items-center gap-2 transition-transform transform hover:scale-105 hover:bg-cyan-700"
+      <div className="bg-[#1a3c40]/80 backdrop-blur-xl p-8 rounded-2xl w-full max-w-md shadow-xl border border-[#b3d1d6]/20 transform hover:scale-102 transition-transform duration-200">
+        <div className="space-y-6">
+          <button
+            className="w-full bg-[#b3d1d6] text-[#0d2a34] p-6 rounded-xl flex items-center justify-between shadow-md hover:bg-[#a1c3c8] transition-all duration-200"
             onClick={() => navigate("/upload-image")}
           >
-            <ScanEye size={32} className="text-white" />
-            <h2 className="text-2xl font-bold">Scan</h2>
-            <p className="text-base">Generate Report Based on Image Analysis</p>
-          </div>
-
-          {/* Insight Button */}
-          <div
-            className="bg-blue-600 p-8 rounded-xl text-white shadow-lg cursor-pointer text-center flex flex-col items-center gap-2 transition-transform transform hover:scale-105 hover:bg-blue-700"
+            <div className="flex items-center gap-3">
+              <ScanEye size={28} />
+              <span className="text-lg font-semibold">Scan</span>
+            </div>
+            <span className="text-sm opacity-75">Analyze Image</span>
+          </button>
+          <button
+            className="w-full bg-[#b3d1d6] text-[#0d2a34] p-6 rounded-xl flex items-center justify-between shadow-md hover:bg-[#a1c3c8] transition-all duration-200"
             onClick={() => navigate("/insight")}
           >
-            <Lightbulb size={32} className="text-white" />
-            <h2 className="text-2xl font-bold">Insight</h2>
-            <p className="text-base">Know more about Cataract.</p>
-          </div>
+            <div className="flex items-center gap-3">
+              <Lightbulb size={28} />
+              <span className="text-lg font-semibold">Insight</span>
+            </div>
+            <span className="text-sm opacity-75">Learn More</span>
+          </button>
         </div>
       </div>
 
-      {/* Bottom Navigation Bar */}
-      <nav className="fixed bottom-0 left-0 w-full bg-gray-900 p-5 flex justify-around text-white shadow-lg">
-        <button className="flex flex-col items-center hover:text-cyan-300" onClick={() => navigate("/dashboard")}>
-          <Home size={24} />
-          <span className="text-sm">Home</span>
-        </button>
-        <button className="flex flex-col items-center hover:text-cyan-300" onClick={() => navigate("/reports")}>
-          <FileText size={24} />
-          <span className="text-sm">Reports</span>
-        </button>
-        <button className="flex flex-col items-center hover:text-cyan-300" onClick={() => navigate("/settings")}>
-          <Settings size={24} />
-          <span className="text-sm">Settings</span>
-        </button>
-        <button className="flex flex-col items-center hover:text-cyan-300" onClick={() => navigate("/profile")}>
-          <User size={24} />
-          <span className="text-sm">Profile</span>
-        </button>
-      </nav>
+      {/* Previous Scans Section */}
+      <PreviousScans />
+
+      <Navbar />
     </div>
   );
 }
