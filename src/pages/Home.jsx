@@ -1,37 +1,41 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const Home = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#6d8c94] px-6 text-center">
-      <h1 className="text-4xl font-extrabold text-gray-800 mb-4">
-        Hello User!!
-      </h1>
-      <p className="text-gray-700 text-lg max-w-2xl leading-relaxed">
-        <span className="font-semibold text-gray-900">CataScan</span> is a
-        <span className="font-semibold text-gray-900">
-          {" "}
-          User-Friendly WebApp
-        </span>{" "}
-        that helps in the early detection of cataract using images taken from
-        your phone.
-      </p>
-      <div className="mt-8 flex space-x-6">
-        <button
-          className="bg-[#1a3c40] text-white text-lg font-semibold px-6 py-3 rounded-lg shadow-md transition duration-300 hover:bg-[#3a506b] hover:scale-105"
-          onClick={() => navigate("/signin")}
-        >
-          Sign In
-        </button>
-        <button
-          className="bg-gray-300 text-gray-800 text-lg font-semibold px-6 py-3 rounded-lg shadow-md transition duration-300 hover:bg-gray-400 hover:scale-105"
-          onClick={() => navigate("/signup")}
-        >
-          Register
-        </button>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-[#0d2a34] to-[#6d8c94] flex flex-col items-center justify-center px-6 py-8">
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="bg-[#1a3c40]/90 backdrop-blur-xl p-8 rounded-2xl w-full max-w-md border border-[#b3d1d6]/30 text-[#b3d1d6] shadow-lg shadow-[#0d2a34]/40"
+      >
+        <h1 className="text-3xl font-bold text-[#b3d1d6] mb-4 text-center tracking-wide">
+          Welcome to CataScan!
+        </h1>
+        <p className="text-[#b3d1d6]/90 text-base leading-relaxed text-center mb-6">
+          <span className="font-semibold">CataScan</span> is an advanced web app
+          designed for early cataract detection. Using smart image analysis, it
+          helps users monitor eye health conveniently from their smartphones.
+        </p>
+        <div className="flex flex-col space-y-4">
+          <button
+            className="w-full py-3 bg-[#b3d1d6] text-[#0d2a34] rounded-xl font-semibold text-lg transition-all duration-200 hover:bg-[#d3e6ea] focus:ring-2 focus:ring-[#b3d1d6]/50"
+            onClick={() => navigate("/signin")}
+          >
+            Sign In
+          </button>
+          <button
+            className="w-full py-3 bg-transparent text-[#b3d1d6] rounded-xl font-semibold text-lg border border-[#b3d1d6]/30 transition-all duration-200 hover:bg-[#b3d1d6]/20 focus:ring-2 focus:ring-[#b3d1d6]/50"
+            onClick={() => navigate("/signup")}
+          >
+            Register
+          </button>
+        </div>
+      </motion.div>
     </div>
   );
 };
